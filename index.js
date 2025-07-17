@@ -14,11 +14,18 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-app.use(cors({
-    origin: 'http://localhost:3001',
-    credentials: true // If you're using cookies or Authorization headers
-  }));
+const allowedOrigins = ['http://localhost:3000', 'https://dashboard-rbac-client.vercel.app'];
 
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
